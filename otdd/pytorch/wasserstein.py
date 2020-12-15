@@ -331,10 +331,11 @@ def pwdist_exact(X1, Y1, X2=None, Y2=None, symmetric=False, loss='sinkhorn',
     pbar.set_description('Computing label-to-label distances')
     D = torch.zeros((n1, n2), device = device, dtype=X1.dtype)
     for i, j in pbar:
-        try:
-            D[i, j] = distance(X1[Y1==c1[i]].to(device), X2[Y2==c2[j]].to(device)).item()
-        except:
-            pdb.set_trace()
+        D[i, j] = distance(X1[Y1==c1[i]].to(device), X2[Y2==c2[j]].to(device)).item()
+        # try:
+        #     D[i, j] = distance(X1[Y1==c1[i]].to(device), X2[Y2==c2[j]].to(device)).item()
+        # except:
+        #     pdb.set_trace()
         if symmetric:
             D[j, i] = D[i, j]
     return D
