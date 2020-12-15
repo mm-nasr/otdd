@@ -280,7 +280,7 @@ def load_torchvision_data(dataname, valid_size=0.1, splits=None, shuffle=True,
 
         transform_list = []
 
-        if dataname in ['MNIST', 'USPS'] and to3channels:
+        if dataname in ['MNIST', 'USPS', 'FashionMNIST', 'KMNIST'] and to3channels:
             transform_list.append(torchvision.transforms.Grayscale(3))
 
         transform_list.append(torchvision.transforms.ToTensor())
