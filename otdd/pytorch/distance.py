@@ -166,8 +166,12 @@ class DatasetDistance():
                  eigen_correction=False,
                  device='cpu',
                  precision='single',
-                 verbose=1, *args, **kwargs):
-
+                 verbose=1,
+                 ## Extra arguments for chosing specific labels
+                 chosen_classes_1=None,
+                 chosen_classes_2=None,
+                 *args, **kwargs):
+        self.chosen_classes_1, self.chosen_classes_2 = chosen_classes_1, chosen_classes_2
         self.method = method
         assert self.method in ['precomputed_labeldist', 'augmentation', 'jdot']
         self.symmetric_tasks = symmetric_tasks
@@ -262,9 +266,17 @@ class DatasetDistance():
         ## Ignore everything with a label occurring less than k times
         self.V1 = torch.sort(vals1[cts1 >= self.min_labelcount])[0]
         self.V2 = torch.sort(vals2[cts2 >= self.min_labelcount])[0]
+        
+        ## Use only with labels that are chosen by user
+        if self.chosen_classes_1 is not None:
+            ind1 = [i for i in range(len(self.V1)) if self.V1[i] in self.chosen_classes_1]
+            self.V1 = self.V1[ind1]
+        if self.chosen_classes_2 is not None:
+            ind2 = [i for i in range(len(self.V2)) if self.V2[i] in self.chosen_classes_2]
+            self.V2 = self.V2[ind2]
         self.classes1 = [classes1[i] for i in self.V1]
         self.classes2 = [classes2[i] for i in self.V2]
-
+        
         if self.method == 'jdot': ## JDOT only works if same labels on both datasets
             assert torch.all(self.V1 == self.V2)
 

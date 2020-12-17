@@ -95,6 +95,24 @@ class Cutout(object):
         img *= mask
         return img
 
+class YourSampler(torch.utils.data.sampler.Sampler):
+    def __init__(self, mask, data_source):
+        self.mask = mask
+        self.data_source = data_source
+
+    def __iter__(self):
+        return iter([i.item() for i in torch.nonzero(mask)])
+
+    def __len__(self):
+        return len(self.data_source)
+
+def filter_dataset(dataset, labels):
+    mask = [1 if X[1] in labels else 0 for X in dataset]
+    mask = torch.tensor(mask)   
+    sampler = YourSampler(mask, dataset)
+    ds2 = dataloader.DataLoader(dataset, batch_size=1,sampler = sampler, 
+                            shuffle=False, num_workers=1)
+    return ds2 
 
 class SubsetSampler(torch.utils.data.Sampler):
     r"""Samples elements in order (not randomly) from a given list of indices, without replacement.
@@ -112,6 +130,7 @@ class SubsetSampler(torch.utils.data.Sampler):
 
     def __len__(self):
         return len(self.indices)
+
 
 class CustomTensorDataset(torch.utils.data.Dataset):
     """TensorDataset with support of transforms."""
@@ -272,6 +291,7 @@ def load_torchvision_data(dataname, valid_size=0.1, splits=None, shuffle=True,
     if shuffle == True and random_seed:
         np.random.seed(random_seed)
     if transform is None:
+        # STEP ONE
         if dataname in DATASET_NORMALIZATION.keys():
             transform_dataname = dataname
         else:
@@ -305,6 +325,7 @@ def load_torchvision_data(dataname, valid_size=0.1, splits=None, shuffle=True,
             raise ValueError()
 
     if data is None:
+        # STEP TWO
         DATASET = getattr(torchvision.datasets, dataname)
         if datadir is None:
             datadir = os.path.join(ROOT_DIR,'data/')
@@ -335,7 +356,13 @@ def load_torchvision_data(dataname, valid_size=0.1, splits=None, shuffle=True,
             test.classes = train.classes
             train.targets = torch.tensor(train.labels)
             test.targets = torch.tensor(test.labels)
+        elif dataname == 'SVHN':
+            train = DATASET(datadir, download=True, transform=train_transform)
+            test = DATASET(datadir, download=True, transform=train_transform)
+            train.targets = torch.from_numpy(train.labels)
+            test.targets = torch.from_numpy(test.labels)
         else:
+            # STEP THREE
             train = DATASET(datadir, train=True, download=True, transform=train_transform)
             test = DATASET(datadir, train=False, download=True, transform=valid_transform)
     else:
@@ -354,6 +381,7 @@ def load_torchvision_data(dataname, valid_size=0.1, splits=None, shuffle=True,
     ### Data splitting
     fold_idxs    = {}
     if splits is None and valid_size == 0:
+        # STEP FOUR
         ## Only train
         fold_idxs['train'] = np.arange(len(train))
     elif splits is None and valid_size > 0:
