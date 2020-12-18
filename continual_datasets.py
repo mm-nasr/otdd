@@ -20,27 +20,27 @@ for ds_name in DATASETS:
 	datasets[ds_name] = load_torchvision_data(ds_name, to3channels=True, resize=32, 
 											valid_size=0, maxsize = 5000)[0]['train']
 
-distances = np.zeros((n_datasets,n_datasets))
-for i, set1 in enumerate(datasets):
-	for j, set2 in enumerate(datasets):
-		if  i >= j :
-			continue
-		dist = DatasetDistance(datasets[set1], datasets[set2],
-                       inner_ot_method = 'exact',
-                       debiased_loss = True,
-                       p = 2, entreg = 1e-1,
-                       device=device,
-					   chosen_classes_1=None,
-					   chosen_classes_2=None)
+# distances = np.zeros((n_datasets,n_datasets))
+# for i, set1 in enumerate(datasets):
+# 	for j, set2 in enumerate(datasets):
+# 		if  i >= j :
+# 			continue
+# 		dist = DatasetDistance(datasets[set1], datasets[set2],
+#                        inner_ot_method = 'exact',
+#                        debiased_loss = True,
+#                        p = 2, entreg = 1e-1,
+#                        device=device,
+# 					   chosen_classes_1=None,
+# 					   chosen_classes_2=None)
 
-		d = dist.distance(maxsamples = 3000)
-		print('OOTD({},{}) = {}'.format(set1,set2,d))
-		distances[i,j] = d
-		distances[j,i] = d
-dist_df = pd.DataFrame(distances, columns=DATASETS, index=DATASETS)
+# 		d = dist.distance(maxsamples = 3000)
+# 		print('OOTD({},{}) = {}'.format(set1,set2,d))
+# 		distances[i,j] = d
+# 		distances[j,i] = d
+# dist_df = pd.DataFrame(distances, columns=DATASETS, index=DATASETS)
 
-#print(distances)
-print(dist_df)
+# #print(distances)
+# print(dist_df)
 
 
 
@@ -48,7 +48,7 @@ print(dist_df)
 classes_div = [[0,1], [2,3], [4,5], [6,7], [8,9]]
 
 for ds_name in ['MNIST', 'CIFAR10']:
-	distances = np.zeros((5,5))
+	distances = np.zeros((15,15))
 	for i in range(len(classes_div)):
 		col_names = []
 		for j in range(i, len(classes_div)):
@@ -67,7 +67,7 @@ for ds_name in ['MNIST', 'CIFAR10']:
 			distances[i,j] = d
 			distances[j,i] = d
 
-		col_names.append(ds + str(classes1))
+		col_names.append(ds_name + str(classes1))
 
 	dist_df = pd.DataFrame(distances, columns=col_names, index=col_names)
 
