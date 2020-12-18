@@ -41,3 +41,34 @@ dist_df = pd.DataFrame(distances, columns=DATASETS, index=DATASETS)
 
 #print(distances)
 print(dist_df)
+
+
+
+## Now do inter-dataset distance calculations
+classes_div = [[0,1], [2,3], [4,5], [6,7], [8,9]]
+
+for ds in ['MNIST', 'CIFAR10']:
+	for i in range(len(classes_div)):
+		col_names = []
+		for j in range(i, len(classes_div)):
+			classes1 = classes_div[i]
+			classes2 = classes_div[j]
+			dist = DatasetDistance(ds, ds,
+	               inner_ot_method = 'exact',
+	               debiased_loss = True,
+	               p = 2, entreg = 1e-1,
+	               device=device,
+				   chosen_classes_1 = classes1,
+				   chosen_classes_2 = classes2)
+
+			d = dist.distance(maxsamples = 3000)
+			print('OOTD({},{}) = {}'.format(set1,set2,d))
+			distances[i,j] = d
+			distances[j,i] = d
+
+		col_names.append(ds + str(classes1))
+
+	dist_df = pd.DataFrame(distances, columns=col_names, index=col_names)
+
+	#print(distances)
+	print(dist_df)
