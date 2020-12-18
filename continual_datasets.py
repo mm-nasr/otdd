@@ -47,13 +47,14 @@ print(dist_df)
 ## Now do inter-dataset distance calculations
 classes_div = [[0,1], [2,3], [4,5], [6,7], [8,9]]
 
-for ds in ['MNIST', 'CIFAR10']:
+for ds_name in ['MNIST', 'CIFAR10']:
+	distances = np.zeros((5,5))
 	for i in range(len(classes_div)):
 		col_names = []
 		for j in range(i, len(classes_div)):
 			classes1 = classes_div[i]
 			classes2 = classes_div[j]
-			dist = DatasetDistance(ds, ds,
+			dist = DatasetDistance(datasets[ds_name], datasets[ds_name],
 	               inner_ot_method = 'exact',
 	               debiased_loss = True,
 	               p = 2, entreg = 1e-1,
