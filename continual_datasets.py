@@ -11,13 +11,14 @@ else:
 
 
 # Load datasets
-DATASETS = ['MNIST','KMNIST', 'FashionMNIST', 'SVHN', 'CIFAR10']
+DATASETS = ['MNIST','KMNIST']
+#, 'FashionMNIST', 'SVHN', 'CIFAR10']
 # 'USPS'
 datasets = {}
 n_datasets = len(DATASETS)
 
 for ds_name in DATASETS:
-	datasets[ds_name] = load_torchvision_data(ds_name, to3channels=True, resize=32, 
+	datasets[ds_name] = load_torchvision_data(ds_name, to3channels=True, resize=28, 
 											valid_size=0, maxsize = 5000)[0]['train']
 
 # distances = np.zeros((n_datasets,n_datasets))
@@ -48,7 +49,7 @@ for ds_name in DATASETS:
 classes_div = [[0,1], [2,3], [4,5], [6,7], [8,9]]
 
 for ds_name in ['MNIST', 'CIFAR10']:
-	distances = np.zeros((15,15))
+	distances = np.zeros((5,5))
 	for i in range(len(classes_div)):
 		col_names = []
 		for j in range(i, len(classes_div)):
@@ -63,13 +64,13 @@ for ds_name in ['MNIST', 'CIFAR10']:
 				   chosen_classes_2 = classes2)
 
 			d = dist.distance(maxsamples = 3000)
-			print('OOTD({},{}) = {}'.format(set1,set2,d))
+			print('OOTD({},{}) = {}'.format(ds_name,ds_name,d))
 			distances[i,j] = d
 			distances[j,i] = d
 
 		col_names.append(ds_name + str(classes1))
 
-	dist_df = pd.DataFrame(distances, columns=col_names, index=col_names)
+	#dist_df = pd.DataFrame(distances, columns=col_names, index=col_names)
 
-	#print(distances)
-	print(dist_df)
+	print(distances)
+	#print(dist_df)
