@@ -12,13 +12,13 @@ else:
 TO3CHANNELS = True
 
 # Load datasets
-DATASETS = ['MNIST', 'EMNIST', 'FashionMNIST', 'KMNIST', 'CIFAR10']
-# 'USPS', 'SVHN'
+DATASETS = ['MNIST', 'FashionMNIST', 'KMNIST', 'CIFAR10', 'SVHN']
+# 'USPS', 'SVHN', 'EMNIST'
 datasets = {}
 n_datasets = len(DATASETS)
 
 for ds_name in DATASETS:
-	datasets[ds_name] = load_torchvision_data(ds_name, to3channels=TO3CHANNELS, resize=28, 
+	datasets[ds_name] = load_torchvision_data(ds_name, to3channels=TO3CHANNELS, resize=34, 
 											valid_size=0, maxsize = 5000)[0]['train']
 
 distances = np.zeros((n_datasets,n_datasets))
@@ -34,7 +34,7 @@ for i, set1 in enumerate(datasets):
 					   chosen_classes_1=None,
 					   chosen_classes_2=None)
 
-		d = dist.distance(maxsamples = 3000)
+		d = dist.distance(maxsamples = 1000)
 		if TO3CHANNELS:
 			d /= 3
 		print('OOTD({},{}) = {}'.format(set1,set2,d))
