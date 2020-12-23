@@ -27,7 +27,7 @@ n_datasets = len(DATASETS)
 
 for ds_name in DATASETS:
 	datasets[ds_name] = load_torchvision_data(ds_name, to3channels=TO3CHANNELS, resize=34, 
-											valid_size=0, maxsize = 10000)[0]['train']
+											valid_size=0, maxsize = 5000)[0]['train']
 
 if args.dist_type == 'between':
 	print('Calculating distance between datasets')
@@ -44,7 +44,7 @@ if args.dist_type == 'between':
 						   chosen_classes_1=None,
 						   chosen_classes_2=None)
 
-			d = dist.distance(maxsamples = 5000)
+			d = dist.distance(maxsamples = 1000)
 			if TO3CHANNELS:
 				d /= 3
 			print('OOTD({},{}) = {}'.format(set1,set2,d))
@@ -54,7 +54,6 @@ if args.dist_type == 'between':
 
 	#print(distances)
 	print(dist_df)
-
 
 elif args.dist_type == 'inter':
 	print('Calculating distance between class groups of MNIST and CIFAR10')
@@ -76,7 +75,7 @@ elif args.dist_type == 'inter':
 					   chosen_classes_1 = classes1,
 					   chosen_classes_2 = classes2)
 
-				d = dist.distance(maxsamples = 5000)
+				d = dist.distance(maxsamples = 1000)
 				if TO3CHANNELS:
 					d /= 3
 				print('OOTD({},{}) = {}'.format(ds_name,ds_name,d))
